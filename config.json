@@ -1,0 +1,11 @@
+{
+  "connectTimeout": 60000,
+  "trace": false,
+  "supportBigNumbers": true,
+  "host": "localhost",
+  "user": "root",
+  "database": "glorriusrp",
+  "waitForConnections": true,
+  "connectionLimit": 10,
+  "queueLimit": 0
+}
