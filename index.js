@@ -4,13 +4,6 @@ let connectedToDatabase = false;
 const config = require("./config.json");
 // create the connection to database
 
-const isObject = (options) => {
-  if (Object.prototype.toString.call(options) === "[object Object]") {
-    return true;
-  }
-  return false;
-};
-
 const awaitDatabaseConnection = async () => {
   if (connectedToDatabase) return;
   await new Promise((ensure) => {
@@ -35,21 +28,13 @@ const initConnection = async () => {
 };
 initConnection();
 
-const executeSQL = async (sqlQuery, options) => {
+const execute = async (sqlQuery, options) => {
   const resource = GetInvokingResource();
-  let optionsArr;
-  const check = isObject(options);
-  check ? (optionsArr = []) : (optionsArr = options);
-  if (check) {
-    for (const [val, index] of Object.entries(options)) {
-      optionsArr.push(val);
-    }
-  }
 
   if (!connectedToDatabase) await awaitDatabaseConnection();
 
-  const [results, fields, err] = await db.query(sqlQuery, optionsArr);
-  if (err) return console.error(err);
+  const [results, fields, err] = await db.query(sqlQuery, options);
+  if (err) return console.log(err);
   return results;
 };
 
@@ -58,7 +43,7 @@ const transaction = async (objects) => {
   if (!connectedToDatabase) await awaitDatabaseConnection();
   const isArr = Array.isArray(objects);
   if (!isArr)
-    return console.error(
+    return console.log(
       "The given parameters to the transaction are faulty. Type needed: Array, type recieved: " +
         typeof objects
     );
@@ -71,21 +56,10 @@ const transaction = async (objects) => {
       promises.push(results);
     }
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
   return promises;
 };
 
-exports("exec", executeSQL);
+exports("exec", execute);
 exports("transaction", transaction);
-
-// const deneme = async () => {
-//   const obj = [
-//     ["SELECT * FROM players", []],
-//     ["DELETE FROM gls_whitelist WHERE hex = ?", ["PYL76366"]],
-//   ];
-//   const res = await transaction(obj);
-//   console.log(res);
-// };
-
-// deneme();
